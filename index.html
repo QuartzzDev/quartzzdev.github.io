@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuaKalp &lt;3</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="glcanvas"></canvas>
+<div id="emoji-container"></div>
+<a id="quadev-link" href="https://github.com/QuartzzDev" target="_blank">QuaDev &lt;3</a>
+<script>
+const canvas = document.getElementById("glcanvas");
+const gl = canvas.getContext("webgl");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+}
+window.addEventListener("resize", resize);
+resize();
+
+const vertexShaderSrc = `
+attribute vec4 a_position;
+void main() {
+  gl_Position = a_position;
+}`;
+
+async function main() {
+  const fragSrc = await fetch('shader.frag').then(r => r.text());
+
+  const vs = compileShader(gl.VERTEX_SHADER, vertexShaderSrc);
+  const fs = compileShader(gl.FRAGMENT_SHADER, fragSrc);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+  const loc = gl.getAttribLocation(prog, "a_position");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  const resLoc = gl.getUniformLocation(prog, "iResolution");
+  const timeLoc = gl.getUniformLocation(prog, "iTime");
+  const speedLoc = gl.getUniformLocation(prog, "u_speed");
+
+  const speed = 5.0;
+
+  function render(time) {
+    gl.uniform2f(resLoc, canvas.width, canvas.height);
+    gl.uniform1f(timeLoc, time * 0.001);
+    gl.uniform1f(speedLoc, speed);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+}
+
+function compileShader(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    console.error(gl.getShaderInfoLog(s));
+    throw gl.getShaderInfoLog(s);
+  }
+  return s;
+}
+
+main();
+
+// EMOJI EFFECT
+const emojis = ["😍", "🥰", "🎉"];
+const emojiContainer = document.getElementById("emoji-container");
+
+function spawnEmoji(x, y) {
+  for (let i = 0; i < 5; i++) {  // Emoji Sayısı buradan ayarlanıyor
+    const emoji = document.createElement("div");
+    emoji.className = "emoji";
+    emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    // Hafif dağıtarak konumlandırma (konfeti stili)
+    const offsetX = (Math.random() - 0.5) * 160; 
+    const offsetY = (Math.random() - 0.5) * 60;  
+    
+    emoji.style.left = `${x + offsetX}px`;
+    emoji.style.top = `${y + offsetY}px`;
+    emoji.style.fontSize = `${24 + Math.random() * 12}px`;
+    emojiContainer.appendChild(emoji);
+    
+    setTimeout(() => emoji.remove(), 2000);
+  }
+}
+
+canvas.addEventListener("click", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  spawnEmoji(x, y);
+});
+
+</script>
+</body>
+</html>
