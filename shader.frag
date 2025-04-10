@@ -1,8 +1,8 @@
-precision mediump float;
+precision highp float;       // Telefonlar için Güncelleme
 
 uniform vec2 iResolution;
 uniform float iTime;
-uniform float u_speed;         // EKLENDİ!
+uniform float u_speed;         // Kalp Hızı eklendi 
 
 #define POINT_COUNT 8
 vec2 points[POINT_COUNT];
@@ -116,12 +116,12 @@ void main() {
     float dist = getSegment(t, pos, 0.0);
     float glow = getGlow(dist, radius, intensity);
     vec3 col = vec3(0.0);
-    col += 10.0 * smoothstep(0.006, 0.003, dist);
+    col += 10.0 * smoothstep(0.01, 0.002, dist);
     col += glow * getColor(t);
 
     dist = getSegment(t, pos, 3.4);
     glow = getGlow(dist, radius, intensity);
-    col += 10.0 * smoothstep(0.006, 0.003, dist);
+    col += 10.0 * smoothstep(0.01, 0.002, dist);
     col += glow * getColor(t);
 
     col = 1.0 - exp(-col);
