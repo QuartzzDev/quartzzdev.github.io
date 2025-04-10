@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QuaKalp &lt;3</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 </head>
 <body>
 <canvas id="glcanvas"></canvas>
@@ -53,7 +53,7 @@ async function main() {
   const timeLoc = gl.getUniformLocation(prog, "iTime");
   const speedLoc = gl.getUniformLocation(prog, "u_speed");
 
-  const speed = 5.0;
+  const speed = 6.0;      // Kalp Hızı Buradan Ayarlanıyor.
 
   function render(time) {
     gl.uniform2f(resLoc, canvas.width, canvas.height);
